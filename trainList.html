@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+	<title>热门课程</title>
+	<link rel="stylesheet" href="css/base.css">
+	<link rel="stylesheet" href="css/common.css">
+	<link rel="stylesheet" href="css/foodList.css">
+	<link rel="stylesheet" href="css/dropload.css">
+	<style>.nav{border: none;}</style>
+  <script>
+      document.onreadystatechange=function(){
+          if(document.readyState=='complete'){
+              $('.loading1').fadeOut();
+          }
+      }
+  </script>
+</head>
+<body>
+	<!-- 网页加载进度条 -->
+    <div class="loading1">
+        <div class="pic"></div>
+    </div>
+	<header>
+		<div class="left">
+			<a href="#" onclick="javascript:window.history.back(-1);return false;"><img src="images/干货切图/ico_back@3x.png" height="16"alt=""></a>
+		</div>
+		<div class="middle">全部训练</div>
+	</header>
+	<!--导航栏-->
+  <div class="nav"></div>
+	<!-- 热门课程列 -->
+	<div class="content">
+		<ul class="lists list2 products"></ul>	
+	</div>
+	<script src="js/jquery-3.2.1.min.js"></script>
+	<script src="js/dropload.min.js"></script>
+  <script>
+  	$(function(){
+    // 页数
+    var currentPage = 0;
+    // 每页展示5个
+    var size = 5;
+
+    // dropload
+    $('.content').dropload({
+        scrollArea : window,
+        loadDownFn : function(me){
+            currentPage++;
+            // 拼接HTML
+            var result = '';
+            var five="http://www.mffive.com:8080";
+            $.ajax({
+                type: 'post',
+                url: 'http://www.mffive.com:8080/drysaltery/getAppList?currentPage='+currentPage+'&size='+size,
+                dataType: 'json',
+                // data:{
+                //     currentPage:currentPage  
+                // },
+                success: function(data){
+                    console.log(data)
+                    console.log('http://www.mffive.com:8080/drysaltery/getAppList?currentPage='+currentPage+'&size='+size)
+                    var arrLen = data.obj.length;
+                    var a =data.objExt;
+                    console.log(arrLen)
+                    if(currentPage<=a){
+                        for(var i=0; i<arrLen; i++){
+                            result +=   '<li>'
+				 							+'<a href="train-information.html?drysalteryFileID='+data.obj[i].drysalteryFileID+'">'
+												+'<div class="img">'
+													+'<img src="'+five+data.obj[i].picUrl+'" alt="">'
+												+'</div>'
+												+'<p class="one">'+data.obj[i].title+'</p>'
+											+'</a>'
+										 +'</li>';
+
+                        }
+                    // 如果没有数据
+                    }else{
+                        // 锁定
+                        me.lock();
+                        // 无数据
+                        me.noData();
+                    }
+                    // 为了测试，延迟1秒加载
+                    setTimeout(function(){
+                        // 插入数据到页面，放到最后面
+                        $('.lists').append(result);
+                        // 每次数据插入，必须重置
+                        me.resetload();
+                    },1000);
+                },
+                error: function(xhr, type){
+                    alert('Ajax error!');
+                    // 即使加载出错，也得重置
+                    me.resetload();
+                }
+            });
+        }
+    });
+});
+  </script>
+</body>
+</html>
